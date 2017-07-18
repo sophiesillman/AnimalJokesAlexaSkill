@@ -42,23 +42,25 @@ namespace AnimalJokes
         {
             XDocument jokesDoc = XDocument.Load("Jokes.xml");
 
-            if (jokesDoc != null)
+            if (jokesDoc == null)
             {
-                XElement jokesRootElement = jokesDoc.Root;
+                return;
+            }
 
-                IEnumerable<XElement> jokes = jokesRootElement.Elements("Joke");
+            XElement jokesRootElement = jokesDoc.Root;
 
-                if (jokes.Any())
+            IEnumerable<XElement> jokes = jokesRootElement.Elements("Joke");
+
+            if (jokes.Any())
+            {
+                foreach (XElement joke in jokes)
                 {
-                    foreach (XElement joke in jokes)
+                    Joke jokeFromXmlDoc = new Joke
                     {
-                        Joke jokeFromXmlDoc = new Joke
-                        {
-                            JokeText = joke.Element("JokeText").Value
-                        };
+                        JokeText = joke.Element("JokeText").Value
+                    };
 
-                        resource.Jokes.Add(jokeFromXmlDoc);
-                    }
+                    resource.Jokes.Add(jokeFromXmlDoc);
                 }
             }
         }
