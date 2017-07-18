@@ -2,38 +2,50 @@
 <Jokes>
   <Joke>
     <JokeText>What do you call a dog who does magic tricks? A labracadabrador!</JokeText>
+      <Animal>Dog</Animal>
   </Joke>
   <Joke>
     <JokeText>What did the duck say when he bought lipstick? Put it on my bill!</JokeText>
+    <Animal>Duck</Animal>
   </Joke>
   <Joke>
     <JokeText>Why couldn't the leopard play hide and seek? Because he was always spotted!</JokeText>
+    <Animal>Leopard</Animal>
   </Joke>
   <Joke>
     <JokeText>What do you call a pig that does Karate? A pork chop</JokeText>
+    <Animal>Pig</Animal>
   </Joke>
   <Joke>
     <JokeText>What's the difference between a guitar and a fish? You can tune a guitar, but you can't tuna fish</JokeText>
+    <Animal>Fish</Animal>
   </Joke>
   <Joke>
     <JokeText>Why did the fish blush? Because it saw the ocean's bottom</JokeText>
+    <Animal>Fish</Animal>
   </Joke>
   <Joke>
     <JokeText>Why do the french eat snails? They don't like fast food!</JokeText>
+    <Animal>Snail</Animal>
   </Joke>
   <Joke>
     <JokeText>What type of sandals do frogs wear? Open toad!</JokeText>
+    <Animal>Frog</Animal>
   </Joke>
   <Joke>
     <JokeText>What do you get from a pampered cow? Spoiled milk</JokeText>
+    <Animal>Cow</Animal>
   </Joke>
   <Joke>
     <JokeText>What do you get when you cross a snake and a bakery? A python!</JokeText>
+    <Animal>Snake</Animal>
   </Joke>
   <Joke>
     <JokeText>What is out of bounds? An exhausted kangaroo</JokeText>
+    <Animal>Kangaroo</Animal>
   </Joke>
   <Joke>
     <JokeText>What do you call a bear with no ears? A b!</JokeText>
+    <Animal>Bear</Animal>
   </Joke>
 </Jokes>
