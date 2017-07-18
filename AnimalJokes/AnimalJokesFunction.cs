@@ -7,6 +7,7 @@ using Alexa.NET.Request;
 using Alexa.NET.Request.Type;
 using Newtonsoft.Json;
 using AnimalJokes.Data;
+using System.Xml.Linq;
 
 // Assembly attribute to enable the Lambda function's JSON input to be converted into a .NET class.
 [assembly: LambdaSerializer(typeof(Amazon.Lambda.Serialization.Json.JsonSerializer))]
@@ -39,17 +40,27 @@ namespace AnimalJokes
 
         public void GetJokesForResource(JokeResource resource)
         {
-            resource.Jokes.Add("What did the duck say when he bought lipstick? Put it on my bill!");
-            resource.Jokes.Add("Why couldn't the leopard play hide and seek? Because he was always spotted!");
-            resource.Jokes.Add("What do you call a pig that does Karate? A pork chop");
-            resource.Jokes.Add("What's the difference between a guitar and a fish? You can tune a guitar, but you can't tuna fish");
-            resource.Jokes.Add("Why did the fish blush? Because it saw the ocean's bottom");
-            resource.Jokes.Add("Why do the french eat snails? They don't like fast food!");
-            resource.Jokes.Add("What type of sandals do frogs wear? Open toad!");
-            resource.Jokes.Add("What do you get from a pampered cow? Spoiled milk");
-            resource.Jokes.Add("What do you get when you cross a snake and a bakery? A python!");
-            resource.Jokes.Add("What is out of bounds? An exhausted kangaroo");
-            resource.Jokes.Add("What do you call a bear with no ears? A b!");
+            XDocument jokesDoc = XDocument.Load("Jokes.xml");
+
+            if (jokesDoc != null)
+            {
+                XElement jokesRootElement = jokesDoc.Root;
+
+                IEnumerable<XElement> jokes = jokesRootElement.Elements("Joke");
+
+                if (jokes.Any())
+                {
+                    foreach (XElement joke in jokes)
+                    {
+                        Joke jokeFromXmlDoc = new Joke
+                        {
+                            JokeText = joke.Element("JokeText").Value
+                        };
+
+                        resource.Jokes.Add(jokeFromXmlDoc);
+                    }
+                }
+            }
         }
 
         public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
@@ -133,10 +144,10 @@ namespace AnimalJokes
 
             if (withLaunchPreface)
             {
-                return resource.GetJokeMessage + resource.Jokes[r.Next(resource.Jokes.Count)];
+                return resource.GetJokeMessage + resource.Jokes[r.Next(resource.Jokes.Count)].JokeText;
             }
 
-            return resource.Jokes[r.Next(resource.Jokes.Count)];
+            return resource.Jokes[r.Next(resource.Jokes.Count)].JokeText;
         }
     }
 }
