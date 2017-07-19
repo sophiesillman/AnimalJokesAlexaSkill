@@ -117,12 +117,14 @@ namespace AnimalJokes
                         log.LogLine($"GetJokeIntent sent: send new joke");
                         innerResponse = new PlainTextOutputSpeech();
                         (innerResponse as PlainTextOutputSpeech).Text = EmitNewJoke(resource, false);
+                        response.Response.ShouldEndSession = true;
                         break;
 
                     case "GetNewJokeIntent":
                         log.LogLine($"GetNewJokeIntent sent: send new joke");
                         innerResponse = new PlainTextOutputSpeech();
                         (innerResponse as PlainTextOutputSpeech).Text = EmitNewJoke(resource, false);
+                        response.Response.ShouldEndSession = true;
                         break;
 
                     default:
