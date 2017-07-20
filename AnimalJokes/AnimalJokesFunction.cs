@@ -32,10 +32,10 @@ namespace AnimalJokes
         private void GetMessgesForResource(JokeResource enGBResource)
         {
             enGBResource.SkillName = "Animal Jokes";
-            enGBResource.GetJokeMessage = "Here's your animal joke: ";
             enGBResource.HelpMessage = "You can say tell me an animal joke, or, you can say exit... What can I help you with?";
             enGBResource.HelpReprompt = "You can say tell me an animal joke to start";
-            enGBResource.StopMessage = "Goodbye! Come back for a new joke any time";
+            enGBResource.StopMessage = "Goodbye! Come back for a new joke soon";
+            enGBResource.RequestAnotherJokePrompt = "Would you like to hear another joke?";
         }
 
         public void GetJokesForResource(JokeResource resource)
@@ -70,10 +70,11 @@ namespace AnimalJokes
             SkillResponse response = new SkillResponse();
             response.Response = new ResponseBody();
             response.Response.ShouldEndSession = false;
-            IOutputSpeech innerResponse = null;
             ILambdaLogger log = context.Logger;
             log.LogLine($"Skill Request Object:");
             log.LogLine(JsonConvert.SerializeObject(input));
+
+            SsmlOutputSpeech innerResponse = new SsmlOutputSpeech();
 
             List<JokeResource> allResources = GetLocaleResources();
             JokeResource resource = allResources.FirstOrDefault();
@@ -81,9 +82,7 @@ namespace AnimalJokes
             if (input.GetRequestType() == typeof(LaunchRequest))
             {
                 log.LogLine($"Default LaunchRequest made: 'Alexa, open Animal Jokes");
-                innerResponse = new PlainTextOutputSpeech();
-                (innerResponse as PlainTextOutputSpeech).Text = EmitNewJoke(resource, withLaunchPreface: true);
-
+                innerResponse.Ssml = EmitNewJoke(resource, withLaunchPreface: true, isSsml: true);
             }
             else if (input.GetRequestType() == typeof(IntentRequest))
             {
@@ -95,42 +94,36 @@ namespace AnimalJokes
                 {
                     case "AMAZON.CancelIntent":
                         log.LogLine($"AMAZON.CancelIntent: send StopMessage");
-                        innerResponse = new PlainTextOutputSpeech();
-                        (innerResponse as PlainTextOutputSpeech).Text = resource.StopMessage;
+                        innerResponse.Ssml = resource.StopMessage;
                         response.Response.ShouldEndSession = true;
                         break;
 
                     case "AMAZON.StopIntent":
                         log.LogLine($"AMAZON.StopIntent: send StopMessage");
-                        innerResponse = new PlainTextOutputSpeech();
-                        (innerResponse as PlainTextOutputSpeech).Text = resource.StopMessage;
+                        innerResponse.Ssml = resource.StopMessage;
                         response.Response.ShouldEndSession = true;
                         break;
 
                     case "AMAZON.HelpIntent":
                         log.LogLine($"AMAZON.HelpIntent: send HelpMessage");
-                        innerResponse = new PlainTextOutputSpeech();
-                        (innerResponse as PlainTextOutputSpeech).Text = resource.HelpMessage;
+                        innerResponse.Ssml = resource.HelpMessage;
                         break;
 
                     case "GetJokeIntent":
                         log.LogLine($"GetJokeIntent sent: send new joke");
-                        innerResponse = new PlainTextOutputSpeech();
-                        (innerResponse as PlainTextOutputSpeech).Text = EmitNewJoke(resource, false);
+                        innerResponse.Ssml = EmitNewJoke(resource, false, false);
                         response.Response.ShouldEndSession = true;
                         break;
 
                     case "GetNewJokeIntent":
                         log.LogLine($"GetNewJokeIntent sent: send new joke");
-                        innerResponse = new PlainTextOutputSpeech();
-                        (innerResponse as PlainTextOutputSpeech).Text = EmitNewJoke(resource, false);
+                        innerResponse.Ssml = EmitNewJoke(resource, false, false);
                         response.Response.ShouldEndSession = true;
                         break;
 
                     default:
                         log.LogLine($"Unknown intent: " + intentRequest.Intent.Name);
-                        innerResponse = new PlainTextOutputSpeech();
-                        (innerResponse as PlainTextOutputSpeech).Text = resource.HelpReprompt;
+                        innerResponse.Ssml = resource.HelpReprompt;
                         break;
                 }
             }
@@ -142,16 +135,22 @@ namespace AnimalJokes
             return response;
         }
 
-        public string EmitNewJoke(JokeResource resource, bool withLaunchPreface)
+        public string EmitNewJoke(JokeResource resource, bool withLaunchPreface, bool isSsml)
         {
             Random r = new Random();
 
-            if (withLaunchPreface)
+            string responseString = "<speak>";
+
+            if (withLaunchPreface && isSsml)
             {
-                return resource.GetJokeMessage + resource.Jokes[r.Next(resource.Jokes.Count)].JokeText;
+                responseString += resource.Jokes[r.Next(resource.Jokes.Count)].JokeText + "<break time='1s' />" + resource.RequestAnotherJokePrompt;
+            }
+            else
+            {
+                responseString += resource.Jokes[r.Next(resource.Jokes.Count)].JokeText;
             }
 
-            return resource.Jokes[r.Next(resource.Jokes.Count)].JokeText;
+            return responseString + "</speak>";
         }
     }
 }

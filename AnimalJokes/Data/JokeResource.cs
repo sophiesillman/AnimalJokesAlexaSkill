@@ -13,9 +13,9 @@ namespace AnimalJokes.Data
         public string Language { get; set; }
         public string SkillName { get; set; }
         public List<Joke> Jokes { get; set; }
-        public string GetJokeMessage { get; set; }
         public string HelpMessage { get; set; }
         public string HelpReprompt { get; set; }
+        public string RequestAnotherJokePrompt { get; set; }
         public string StopMessage { get; set; }
     }
 }
