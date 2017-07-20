@@ -29,42 +29,6 @@ namespace AnimalJokes
             return resources;
         }
 
-        private void GetMessgesForResource(JokeResource enGBResource)
-        {
-            enGBResource.SkillName = "Animal Jokes";
-            enGBResource.HelpMessage = "You can say tell me an animal joke, or, you can say exit... What can I help you with?";
-            enGBResource.HelpReprompt = "You can say tell me an animal joke to start";
-            enGBResource.StopMessage = "Goodbye! Come back for a joke soon";
-            enGBResource.RequestAnotherJokePrompt = "Would you like to hear another joke?";
-        }
-
-        public void GetJokesForResource(JokeResource resource)
-        {
-            XDocument jokesDoc = XDocument.Load("Jokes.xml");
-
-            if (jokesDoc == null)
-            {
-                return;
-            }
-
-            XElement jokesRootElement = jokesDoc.Root;
-
-            IEnumerable<XElement> jokes = jokesRootElement.Elements("Joke");
-
-            if (jokes.Any())
-            {
-                foreach (XElement joke in jokes)
-                {
-                    Joke jokeFromXmlDoc = new Joke
-                    {
-                        JokeText = joke.Element("JokeText").Value
-                    };
-
-                    resource.Jokes.Add(jokeFromXmlDoc);
-                }
-            }
-        }
-
         public SkillResponse FunctionHandler(SkillRequest input, ILambdaContext context)
         {
             SkillResponse response = new SkillResponse();
@@ -75,6 +39,8 @@ namespace AnimalJokes
             log.LogLine(JsonConvert.SerializeObject(input));
 
             SsmlOutputSpeech innerResponse = new SsmlOutputSpeech();
+
+            innerResponse.Ssml = "<speak></speak>";
 
             List<JokeResource> allResources = GetLocaleResources();
             JokeResource resource = allResources.FirstOrDefault();
@@ -127,6 +93,12 @@ namespace AnimalJokes
                         break;
                 }
             }
+            else if (input.GetRequestType() == typeof(SessionEndedRequest))
+            {
+                log.LogLine($"AMAZON.SessionEndedRequest: send StopMessage");
+                innerResponse.Ssml = "<speak>" + resource.StopMessage + "</speak>";
+                response.Response.ShouldEndSession = true;
+            }
 
             response.Response.OutputSpeech = innerResponse;
             response.Version = "1.0";
@@ -135,7 +107,34 @@ namespace AnimalJokes
             return response;
         }
 
-        public string EmitNewJoke(JokeResource resource, bool withLaunchPreface, bool isSsml)
+        private void GetJokesForResource(JokeResource resource)
+        {
+            XDocument jokesDoc = XDocument.Load("Jokes.xml");
+
+            if (jokesDoc == null)
+            {
+                return;
+            }
+
+            XElement jokesRootElement = jokesDoc.Root;
+
+            IEnumerable<XElement> jokes = jokesRootElement.Elements("Joke");
+
+            if (jokes.Any())
+            {
+                foreach (XElement joke in jokes)
+                {
+                    Joke jokeFromXmlDoc = new Joke
+                    {
+                        JokeText = joke.Element("JokeText").Value
+                    };
+
+                    resource.Jokes.Add(jokeFromXmlDoc);
+                }
+            }
+        }
+
+        private string EmitNewJoke(JokeResource resource, bool withLaunchPreface, bool isSsml)
         {
             Random r = new Random();
 
@@ -151,6 +150,15 @@ namespace AnimalJokes
             }
 
             return responseString + "</speak>";
+        }
+
+        private void GetMessgesForResource(JokeResource enGBResource)
+        {
+            enGBResource.SkillName = "Animal Jokes";
+            enGBResource.HelpMessage = "You can say tell me an animal joke, or, you can say exit... What can I help you with?";
+            enGBResource.HelpReprompt = "You can say tell me an animal joke to start";
+            enGBResource.StopMessage = "Goodbye! Come back for a joke soon";
+            enGBResource.RequestAnotherJokePrompt = "Would you like to hear another joke?";
         }
     }
 }
