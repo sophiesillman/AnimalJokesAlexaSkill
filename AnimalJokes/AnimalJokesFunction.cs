@@ -34,7 +34,7 @@ namespace AnimalJokes
             enGBResource.SkillName = "Animal Jokes";
             enGBResource.HelpMessage = "You can say tell me an animal joke, or, you can say exit... What can I help you with?";
             enGBResource.HelpReprompt = "You can say tell me an animal joke to start";
-            enGBResource.StopMessage = "Goodbye! Come back for a new joke soon";
+            enGBResource.StopMessage = "Goodbye! Come back for a joke soon";
             enGBResource.RequestAnotherJokePrompt = "Would you like to hear another joke?";
         }
 
@@ -94,19 +94,19 @@ namespace AnimalJokes
                 {
                     case "AMAZON.CancelIntent":
                         log.LogLine($"AMAZON.CancelIntent: send StopMessage");
-                        innerResponse.Ssml = resource.StopMessage;
+                        innerResponse.Ssml = "<speak>" + resource.StopMessage + "</speak>";
                         response.Response.ShouldEndSession = true;
                         break;
 
                     case "AMAZON.StopIntent":
                         log.LogLine($"AMAZON.StopIntent: send StopMessage");
-                        innerResponse.Ssml = resource.StopMessage;
+                        innerResponse.Ssml = "<speak>" + resource.StopMessage + "</speak>";
                         response.Response.ShouldEndSession = true;
                         break;
 
                     case "AMAZON.HelpIntent":
                         log.LogLine($"AMAZON.HelpIntent: send HelpMessage");
-                        innerResponse.Ssml = resource.HelpMessage;
+                        innerResponse.Ssml = "<speak>" + resource.HelpMessage + "</speak>";
                         break;
 
                     case "GetJokeIntent":
@@ -123,7 +123,7 @@ namespace AnimalJokes
 
                     default:
                         log.LogLine($"Unknown intent: " + intentRequest.Intent.Name);
-                        innerResponse.Ssml = resource.HelpReprompt;
+                        innerResponse.Ssml = "<speak>" + resource.HelpReprompt + "</speak>";
                         break;
                 }
             }
