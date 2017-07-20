@@ -32,10 +32,9 @@ namespace AnimalJokes
         private void GetMessgesForResource(JokeResource enGBResource)
         {
             enGBResource.SkillName = "Animal Jokes";
-            enGBResource.GetJokeMessage = "Here's your animal joke: ";
             enGBResource.HelpMessage = "You can say tell me an animal joke, or, you can say exit... What can I help you with?";
             enGBResource.HelpReprompt = "You can say tell me an animal joke to start";
-            enGBResource.StopMessage = "Goodbye! Come back for a new joke any time";
+            enGBResource.StopMessage = "Goodbye! Come back for a new joke soon";
             enGBResource.RequestAnotherJokePrompt = "Would you like to hear another joke?";
         }
 
@@ -140,12 +139,18 @@ namespace AnimalJokes
         {
             Random r = new Random();
 
+            string responseString = "<speak>";
+
             if (withLaunchPreface && isSsml)
             {
-                return "<speak>" + resource.GetJokeMessage + resource.Jokes[r.Next(resource.Jokes.Count)].JokeText + "<break time='1s' />" + resource.RequestAnotherJokePrompt + "</speak>";
+                responseString += resource.Jokes[r.Next(resource.Jokes.Count)].JokeText + "<break time='1s' />" + resource.RequestAnotherJokePrompt;
+            }
+            else
+            {
+                responseString += resource.Jokes[r.Next(resource.Jokes.Count)].JokeText;
             }
 
-            return "<speak>" + resource.Jokes[r.Next(resource.Jokes.Count)].JokeText + "</speak>";
+            return responseString + "</speak>";
         }
     }
 }
